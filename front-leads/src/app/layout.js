@@ -1,6 +1,9 @@
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
+// importando componentes
+import Topo from "@/componentes/Topo";
+
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -20,6 +23,7 @@ export default function RootLayout({ children }) {
   return (
     <html lang="pt-br">
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
+        <Topo />
         {children}
       </body>
     </html>

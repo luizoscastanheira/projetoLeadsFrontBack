@@ -5,27 +5,49 @@ import express from "express";
 import cors from "cors";
 
 // Importaçao apenas para teste de conexao
-//import pool from "./src/config/conexao.js"
+// import pool from "./src/config/conexao.js"
 
 const app = express();
 app.use(express.json());    // habilita o req.body para o formato json
 app.use(cors());            // Habilitando CORS
+app.use(express.urlencoded({ extended: true })); // PARA FORMULÁRIOS HTML
 
 // Data
 let data = new Date();
 
 // Importando as funções incluindo CRUD
+// Funções CRUD
 import { createRecord, listRecords } from "./src/repository/leadCRUD.js";
+// Funções de validação
+import { validaDadosAutenticacao, GeraToken } from "./src/middleware/validaLeads.js";
 
 // Início dos endpoints da aplicação
 // Endpoint apenas para verificar informação sobre o servidor
-app.get("/info", (req,res)=>{
+app.get("/info", (req, res)=>{
     let textoMsg = `O servidor está online desde.`;
     res.json({mensagem:textoMsg, horario:data});
 });
 
+// Endpoint de login
+app.post ('/login', (req, res)=>{
+    const usuario = req.body.usuario;
+    const senha = req.body.senha;
+
+    const autenticacaoValida = validaDadosAutenticacao(usuario, senha);
+
+    if(!autenticacaoValida){
+        res.status(401).send({message: "Usuário não autorizado!"});
+        return;
+    };
+
+    const token = GeraToken();
+
+    res.status(200).send({token: token})
+});
+
+
 // Endpoint que lista todos os registros da tabela leads
-app.get("/list", async (req,res)=>{
+app.get("/list", async (req, res)=>{
     const registrosLeads = await listRecords();
 
     res.json(registrosLeads);
