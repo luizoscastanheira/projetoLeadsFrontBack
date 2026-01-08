@@ -2,18 +2,6 @@
 import jwt from "jsonwebtoken";
 import { JWT_SECRET } from "../env/env.js";
 
-// função que gera token
-export function GeraToken() {
-    const usuarioLogado = {"idUsuario": 1}
-
-    const token = jwt.sign(usuarioLogado, JWT_SECRET, { expiresIn: '30d' });
-
-    return token;
-};
-
-
-// Função que valida usuário
-
 
 // Função de autenticação
 function validaDadosAutenticacao(usuario, senha){
@@ -24,8 +12,41 @@ function validaDadosAutenticacao(usuario, senha){
     }
 };
 
+// Função que valida usuário - Não implementada ainda
 
 
-export { validaDadosAutenticacao }
+// função que gera token
+export function GeraToken() {
+    const usuarioLogado = {"idUsuario": 1}
+
+    const token = jwt.sign(usuarioLogado, JWT_SECRET, { expiresIn: '30d' });
+
+    return token;
+};
+
+
+// função que valida o o token recebido
+function validaToken(token){
+    let status;
+    let codigo;
+
+    jwt.verify(token, JWT_SECRET, function(erro, dadosToken){
+        if(erro == null && dadosToken.idUsuario == 1){
+            status = true;
+            codigo = 200;
+        } else {
+            status = false;
+            codigo = 401;
+        };
+    });
+
+    return {status: status, codigo: codigo}
+};
+
+
+
+
+
+export { validaDadosAutenticacao, validaToken }
 
 console.log(JWT_SECRET)

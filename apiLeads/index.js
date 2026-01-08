@@ -19,7 +19,7 @@ let data = new Date();
 // Funções CRUD
 import { createRecord, listRecords } from "./src/repository/leadCRUD.js";
 // Funções de validação
-import { validaDadosAutenticacao, GeraToken } from "./src/middleware/validaLeads.js";
+import { validaDadosAutenticacao, GeraToken, validaToken } from "./src/middleware/validaLeads.js";
 
 // Início dos endpoints da aplicação
 // Endpoint apenas para verificar informação sobre o servidor
@@ -47,11 +47,34 @@ app.post ('/login', (req, res)=>{
 
 
 // Endpoint que lista todos os registros da tabela leads
-app.get("/list", async (req, res)=>{
-    const registrosLeads = await listRecords();
+// endpoint padrão simples
+// app.get("/list", async (req, res)=>{
+//     const registrosLeads = await listRecords();
 
-    res.json(registrosLeads);
+//     res.json(registrosLeads);
+// });
+
+// Endpoint refeito para aceitar autenticação
+app.get ("/list", async (req, res) => {
+    // Recebe o token enviado na requisição e usa split para remover o texto 'Bearer'
+    let token;
+    if(typeof req.headers.authorization !== 'undefined') {
+        token = req.headers.authorization.split(' ')[1];
+    } else {
+        token =-1
+    }
+
+    const tokenValido = validaToken(token);
+    if(!tokenValido.status) {
+        res.status(tokenValido.codigo).end();
+        return;
+    }
+
+    const listaLeads = await listRecords();
+    res.status(tokenValido.codigo).send({listaLeads});
 });
+
+
 
 // Endpoint que cadastra um registro no banco
 app.post("/create", async (req, res)=>{
