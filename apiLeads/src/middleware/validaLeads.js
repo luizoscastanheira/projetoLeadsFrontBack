@@ -44,9 +44,6 @@ function validaToken(token){
 };
 
 
-
-
-
 export { validaDadosAutenticacao, validaToken }
 
 console.log(JWT_SECRET)
